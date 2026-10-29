@@ -87,6 +87,8 @@ local: check setup
 		ONLY_ACTIVE_ARCH=YES \
 		ARCHS=arm64 \
 		ENABLE_HARDENED_RUNTIME=NO \
+		ENABLE_TESTABILITY=NO \
+		ENABLE_CODE_COVERAGE=NO \
 		build
 	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/VoiceInk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
