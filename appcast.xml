@@ -3,20 +3,26 @@
     <channel>
         <title>VoiceInk</title>
         <item>
-            <title>2.11</title>
-            <pubDate>Wed, 12 Aug 2026 19:25:57 +0545</pubDate>
-            <sparkle:version>211</sparkle:version>
-            <sparkle:shortVersionString>2.11</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.4</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h3>What's New in VoiceInk 2.11</h3>
+            <title>2.21</title>
+            <pubDate>Mon, 28 Sep 2026 19:43:04 +0545</pubDate>
+            <sparkle:version>221</sparkle:version>
+            <sparkle:shortVersionString>2.21</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>What's New in VoiceInk 2.21</h3>
 <ul>
-  <li>✨ Added VoiceInk Refine for private, on-device transcription enhancement</li>
-  <li>🗣️ Added experimental Cohere Transcribe support</li>
-  <li>🎙️ Fixed microphone issues when using a MacBook with the lid closed</li>
-  <li>🛠️ Minor improvements and bug fixes</li>
+  <li>🦜 Added support for Parakeet Ultra</li>
+  <li>🌐 Added support for OpenRouter transcription models</li>
+  <li>🤖 Added GPT-6 Luna and GPT-6 Sol enhancement models</li>
+  <li>⚙️ Support for custom AI enhancement model IDs</li>
+  <li>⌨️ Added double-tap recording shortcuts</li>
+  <li>↩️ Made Auto Send a global setting with automatic Return delivery</li>
+  <li>📋 Added mode duplication and context menu actions</li>
+  <li>🧠 Added local CLI support for Dictionary Auto Learn</li>
+  <li>📝 Improved dictionary editing and replacement rules</li>
+  <li>🛠️ Minor bug fixes and improvements</li>
 </ul>
 ]]></description>
-            <enclosure url="https://github.com/Beingpax/VoiceInk/releases/download/v2.11/VoiceInk.dmg" length="48763949" type="application/octet-stream" sparkle:edSignature="qREL4bqQ9wJCFiQ+Yb0/7OWQdZJ/yjUt2RltciRHXM9LMULnKQZRaaVQ6G35a8lsUjVgJdQs4LffBl8OBkp+Dg=="/>
+            <enclosure url="https://github.com/Beingpax/VoiceInk/releases/download/v2.21/VoiceInk.dmg" length="51053559" type="application/octet-stream" sparkle:edSignature="ilXFZq09qe/9bQ9zAXr3AbwL5moVNyGVMj/dcQikvnagiZ+qRKBLhmlIF3O2CmEEppFaLSZPhPgXiQKL4AkJDQ=="/>
         </item>
     </channel>
 </rss>
