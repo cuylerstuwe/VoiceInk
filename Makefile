@@ -3,6 +3,7 @@ DEPS_DIR := $(HOME)/VoiceInk-Dependencies
 WHISPER_CPP_DIR := $(DEPS_DIR)/whisper.cpp
 FRAMEWORK_PATH := $(WHISPER_CPP_DIR)/build-apple/whisper.xcframework
 LOCAL_DERIVED_DATA := $(CURDIR)/.local-build
+LOCAL_APP := /Applications/VoiceInk.app
 
 .PHONY: all clean whisper setup build local check healthcheck help dev run release release-setup
 
@@ -48,8 +49,10 @@ build: setup
 local: check setup
 	@echo "Building VoiceInk for local use (no Apple Developer certificate required)..."
 	@rm -rf "$(LOCAL_DERIVED_DATA)"
-	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Debug \
+	xcodebuild -project VoiceInk.xcodeproj -scheme VoiceInk -configuration Release \
 		-derivedDataPath "$(LOCAL_DERIVED_DATA)" \
+		-skipPackagePluginValidation \
+		-skipMacroValidation \
 		-xcconfig LocalBuild.xcconfig \
 		CODE_SIGN_IDENTITY="-" \
 		CODE_SIGNING_REQUIRED=NO \
@@ -57,16 +60,26 @@ local: check setup
 		DEVELOPMENT_TEAM="" \
 		CODE_SIGN_ENTITLEMENTS="$(CURDIR)/VoiceInk/VoiceInk.local.entitlements" \
 		SWIFT_ACTIVE_COMPILATION_CONDITIONS='$$(inherited) LOCAL_BUILD' \
+		ONLY_ACTIVE_ARCH=YES \
+		ARCHS=arm64 \
+		ENABLE_HARDENED_RUNTIME=NO \
 		build
-	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Debug/VoiceInk.app" && \
+	@APP_PATH="$(LOCAL_DERIVED_DATA)/Build/Products/Release/VoiceInk.app" && \
 	if [ -d "$$APP_PATH" ]; then \
-		echo "Copying VoiceInk.app to ~/Downloads..."; \
-		rm -rf "$$HOME/Downloads/VoiceInk.app"; \
-		ditto "$$APP_PATH" "$$HOME/Downloads/VoiceInk.app"; \
-		xattr -cr "$$HOME/Downloads/VoiceInk.app"; \
+		if pgrep -x VoiceInk >/dev/null 2>&1; then \
+			echo "VoiceInk is running. Quit it before replacing $(LOCAL_APP)."; \
+			exit 1; \
+		fi; \
+		echo "Installing the canonical local build at $(LOCAL_APP)..."; \
+		rm -rf "$(LOCAL_APP)"; \
+		ditto "$$APP_PATH" "$(LOCAL_APP)"; \
+		xattr -cr "$(LOCAL_APP)"; \
+		LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister"; \
+		"$$LSREGISTER" -u "$$APP_PATH" >/dev/null 2>&1 || true; \
+		"$$LSREGISTER" -f -R -trusted "$(LOCAL_APP)"; \
 		echo ""; \
-		echo "Build complete! App saved to: ~/Downloads/VoiceInk.app"; \
-		echo "Run with: open ~/Downloads/VoiceInk.app"; \
+		echo "Build complete! App installed at: $(LOCAL_APP)"; \
+		echo "Run with: open $(LOCAL_APP)"; \
 		echo ""; \
 		echo "Limitations of local builds:"; \
 		echo "  - No iCloud dictionary sync"; \
@@ -78,19 +91,12 @@ local: check setup
 
 # Run application
 run:
-	@if [ -d "$$HOME/Downloads/VoiceInk.app" ]; then \
-		echo "Opening ~/Downloads/VoiceInk.app..."; \
-		open "$$HOME/Downloads/VoiceInk.app"; \
+	@if [ -d "$(LOCAL_APP)" ]; then \
+		echo "Opening $(LOCAL_APP)..."; \
+		open "$(LOCAL_APP)"; \
 	else \
-		echo "Looking for VoiceInk.app in DerivedData..."; \
-		APP_PATH=$$(find "$$HOME/Library/Developer/Xcode/DerivedData" -name "VoiceInk.app" -type d | head -1) && \
-		if [ -n "$$APP_PATH" ]; then \
-			echo "Found app at: $$APP_PATH"; \
-			open "$$APP_PATH"; \
-		else \
-			echo "VoiceInk.app not found. Please run 'make build' or 'make local' first."; \
-			exit 1; \
-		fi; \
+		echo "VoiceInk.app not found at $(LOCAL_APP). Please run 'make local' first."; \
+		exit 1; \
 	fi
 
 # Build a signed, notarized DMG and matching local Sparkle Appcast.
@@ -118,8 +124,8 @@ help:
 	@echo "  whisper            Clone and build whisper.cpp XCFramework"
 	@echo "  setup              Copy whisper XCFramework to VoiceInk project"
 	@echo "  build              Build the VoiceInk Xcode project"
-	@echo "  local              Build for local use (no Apple Developer certificate needed)"
-	@echo "  run                Launch the built VoiceInk app"
+	@echo "  local              Build and install the one local app at $(LOCAL_APP)"
+	@echo "  run                Launch $(LOCAL_APP)"
 	@echo "  dev                Build and run the app (for development)"
 	@echo "  release            Build DMG and Appcast using release-notes/<version>.html"
 	@echo "  release-setup      Store notarization credentials in Keychain"

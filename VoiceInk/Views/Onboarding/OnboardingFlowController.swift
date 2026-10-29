@@ -55,9 +55,19 @@ final class OnboardingFlowController {
         moveToExperienceStep(0, enhancementService: enhancementService)
     }
 
-    func goToLicenseStep(isTranscriptionSetupReady: Bool) {
+    func continueFromTrustStep(
+        isTranscriptionSetupReady: Bool,
+        onComplete: () -> Void
+    ) {
         guard coordinator.isReadyForExperience(isTranscriptionSetupReady: isTranscriptionSetupReady) else { return }
+        #if LOCAL_BUILD
+            completeOnboarding(
+                isTranscriptionSetupReady: isTranscriptionSetupReady,
+                onComplete: onComplete
+            )
+        #else
         coordinator.storedStage = OnboardingStage.license.rawValue
+        #endif
     }
 
     func goToContextAwarenessStep(isTranscriptionSetupReady: Bool) {
@@ -344,8 +354,15 @@ final class OnboardingFlowController {
         isTranscriptionSetupReady: Bool,
         onComplete: () -> Void
     ) {
+        #if LOCAL_BUILD
+            let isSourceBuildCompletion = coordinator.stage == .trust
+        #else
+            let isSourceBuildCompletion = false
+        #endif
+
         guard
             coordinator.stage == .license
+                || isSourceBuildCompletion
                 || coordinator.isCurrentExperienceReady(isTranscriptionSetupReady: isTranscriptionSetupReady)
         else {
             return

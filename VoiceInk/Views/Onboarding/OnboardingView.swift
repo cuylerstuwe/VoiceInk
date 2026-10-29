@@ -165,9 +165,11 @@ struct OnboardingView: View {
                             )
                         },
                         onContinue: {
-                            coordinator.flow.goToLicenseStep(
+                            coordinator.flow.continueFromTrustStep(
                                 isTranscriptionSetupReady: isTranscriptionSetupReady
-                            )
+                            ) {
+                                hasCompletedOnboardingV2 = true
+                            }
                         }
                     )
                     .transition(.opacity)

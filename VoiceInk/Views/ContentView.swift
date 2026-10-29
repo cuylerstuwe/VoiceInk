@@ -31,6 +31,12 @@ final class MainWindowNavigation: ObservableObject {
     }
 
     func navigate(to destination: ViewType) {
+        #if LOCAL_BUILD
+            if destination == .license {
+                selectedView = .settings
+                return
+            }
+        #endif
         selectedView = destination
     }
 }

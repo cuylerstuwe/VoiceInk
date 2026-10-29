@@ -95,6 +95,13 @@ final class OnboardingCoordinator: ObservableObject {
 
     var stage: OnboardingStage {
         if let stage = OnboardingStage(rawValue: storedStage) {
+            #if LOCAL_BUILD
+                // Older local builds may have stopped at the activation screen.
+                // Resume at the final source-build onboarding step instead.
+                if stage == .license {
+                    return .trust
+                }
+            #endif
             return stage
         }
 
@@ -138,7 +145,11 @@ final class OnboardingCoordinator: ObservableObject {
     }
 
     var totalStepCount: Int {
+        #if LOCAL_BUILD
+            return OnboardingStage.baseStepCount + activeExperienceSteps.count + contextAwarenessStepCount + 1
+        #else
         OnboardingStage.baseStepCount + activeExperienceSteps.count + contextAwarenessStepCount + 2
+        #endif
     }
 
     var experienceStep: OnboardingExperienceStep {

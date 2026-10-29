@@ -137,24 +137,39 @@ final class LicenseViewModel: ObservableObject {
     }
 
     var isLicensed: Bool {
+        #if LOCAL_BUILD
+            return true
+        #else
         licenseState == .licensed
+        #endif
     }
 
     var hasVerifiedLicense: Bool {
+        #if LOCAL_BUILD
+            return true
+        #else
         guard isPersistentStateAvailable else { return false }
         return storedLicenseKey != nil && licenseState == .licensed
+        #endif
     }
 
     var canUseApp: Bool {
+        #if LOCAL_BUILD
+            return true
+        #else
         switch licenseState {
         case .licensed, .trial:
             return true
         case .unlicensed, .trialExpired:
             return false
         }
+        #endif
     }
 
     var usageRestrictionMessage: String? {
+        #if LOCAL_BUILD
+            return nil
+        #else
         switch licenseState {
         case .unlicensed, .trialExpired:
             return String(
@@ -164,9 +179,13 @@ final class LicenseViewModel: ObservableObject {
         case .trial, .licensed:
             return nil
         }
+        #endif
     }
 
     var diagnosticLicenseStatus: String {
+        #if LOCAL_BUILD
+            return "Local Source Build (Full Access)"
+        #else
         if userDefaults.bool(forKey: pendingRemovalKey) {
             return "License Removed (Local Cleanup Pending)"
         }
@@ -184,6 +203,7 @@ final class LicenseViewModel: ObservableObject {
         case .unlicensed, .trial, .trialExpired:
             return "Not Licensed"
         }
+        #endif
     }
 
     func openPurchaseLink() {
@@ -451,6 +471,9 @@ final class LicenseViewModel: ObservableObject {
     }
 
     private func resolvedState(at date: Date) -> LicenseState {
+        #if LOCAL_BUILD
+            return .licensed
+        #else
         if storedLicenseKey != nil,
             activationId != nil || !requiresActivation
         {
@@ -469,6 +492,7 @@ final class LicenseViewModel: ObservableObject {
         }
 
         return .trial(daysRemaining: min(trialPeriodDays, trialPeriodDays - daysSinceTrialStart))
+        #endif
     }
 
     private func scheduleStorageRetryIfNeeded() {
